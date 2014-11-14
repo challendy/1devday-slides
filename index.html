@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>reveal.js - The HTML Presentation Framework</title>
+		<title>Dropwizard 1DevDay</title>
 
 		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
 		<meta name="author" content="Hakim El Hattab">
@@ -46,11 +46,12 @@
           <h1>Dropwizard</h1>
 					<p>Chris Hallendy</p>
 				</section>
-
 				<section>
 					<h2>Who am I?</h2>
           <p>technologist @ MadDog Technology</p>
           <p>challendy@maddogtechnology.com</p>
+          <a href="https://github.com/challendy">https://github.com/challendy</a>
+
         </section>
 
 				<section>
@@ -136,13 +137,13 @@
         <div>
             <pre><code contenteditable style="font-size: 18px; margin-top: 20px;">
                 public static void main(String[] args) throws Exception {
-                    new ContactsService().run(args)
+                  new StoreApplication().run(args);
                 }
             </code></pre>
         </div>
         <div>Start the server from the command line by running: </div>
         <div>
-            <pre><code>java -jar contact_dropwizard/build/libs/contact_dropwizard-shadow-0.1.0-SNAPSHOT.jar server start dev_config.yml</code></pre>
+            <pre><code>java -jar target/store-dropwizard-0.0.1-SNAPSHOT.jar server example.yml</code></pre>
         </div>
     </section>
     <section>
@@ -151,21 +152,19 @@
         <div>Services are a collection of bundles, commands, healthchecks, tasks and resources. The service class defines all of the abilities of your application.</div>
         <div>
             <pre><code contenteditable style="font-size: 18px; margin-top: 20px;">@Override
-public void initialize(Bootstrap<ContactsConfiguration> bootstrap) {
-    bootstrap.name = 'configuration_service'
-
+public void initialize(Bootstrap bootstrap) {
     bootstrap.addBundle migrationsBundle
     bootstrap.addBundle hibernateBundle
-    bootstrap.addBundle(new AssetsBundle('/swagger-ui-1.1.0/', '/swagger'))
-    bootstrap.addCommand(new migrationsCommand())
 }
-
 @Override
-    public void run(ContactsConfiguration configuration,
-    Environment environment) throws ClassNotFoundException {
+public void run(StoreConfiguration configuration,
+                    Environment environment) throws ClassNotFoundException {
 
-    ContactDAO contactDAO = new ContactDAO(hibernateBundle.sessionFactory)
-    environment.addResource(new ContactResource(contactDAO))
+  final VisitDAO dao = new VisitDAO(hibernateBundle.getSessionFactory());
+  final Template template = configuration.buildTemplate();
+
+  environment.healthChecks().register("template", new TemplateHealthCheck(template));
+  environment.jersey().register(new VisitResource(dao));
 }
             </code></pre>
         </div>
@@ -175,49 +174,53 @@ public void initialize(Bootstrap<ContactsConfiguration> bootstrap) {
 
         <div>Resources model what is exposed via your RESTful API. Dropwizard uses Jersey for this so these classes are mostly jersey annotations.</div>
         <div>
-            <pre><code contenteditable style="font-size: 18px; margin-top: 20px;">@Path('/contacts')
+            <pre><code contenteditable style="font-size: 18px; margin-top: 20px;">@Path("/visits")
 @Produces(MediaType.APPLICATION_JSON)
-class ContactResource {
-    private final ContactDAO contactDAO
+public class VisitResource  {
 
-    public ContactResource(ContactDAO contactDAO) {
-        this.contactDAO = contactDAO
+    private final VisitDAO visitDAO;
+
+    public VisitResource(VisitDAO visitDAO) {
+        this.visitDAO = visitDAO;
     }
-
-
-    @Timed(name = 'createContact')
+    
+    @Timed(name = "createVisit")
     @POST
     @UnitOfWork
-    public Contact createContact(@Valid Contact contact) {
-        return contactDAO.saveOrUpdate(contact)
+    public Visit createVist(Visit visit) {
+        return visitDAO.create(visit);
     }
-}
-            </code></pre>
+
+    @GET
+    @UnitOfWork
+    public List<Visit> listVisits() {
+        return visitDAO.findAll();
+    }
+}            </code></pre>
         </div>
     </section>
     <section>
         <h2>The Representation</h2>
         <div>Your POGOs will be turned into JSON via Jackson. Hibernate Validator lets you specify validation rules.</div>
         <div>
-            <pre><code contenteditable style="font-size: 18px; margin-top: 20px;">@ToString
-@EqualsAndHashCode
-class Contact {
-    @JsonProperty
-    Long id
-
-    @NotNull
-    @NotEmpty
-    @JsonProperty
-    String firstName
-
-    @NotNull
-    @NotEmpty
-    @JsonProperty
-    String lastName
-
-    @Transient
-    @JsonIgnore
-    def someCrap = false
+            <pre><code contenteditable style="font-size: 18px; margin-top: 20px;">@Entity
+@Table(name = "visits")
+@NamedQueries({
+        @NamedQuery(
+                name = "com.mystore.core.Visit.findAll",
+                query = "SELECT v FROM Visit v"
+        )
+})
+public class Visit {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+    
+    @Column(name = "user_id", nullable = false)
+    private long userId;
+    
+    @Column(name = "beacon_id", nullable = false)
+    private String beaconId;
 }
             </code></pre>
         </div>
