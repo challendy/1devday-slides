@@ -44,6 +44,8 @@
 			<div class="slides">
 				<section>
           <h1>Dropwizard</h1>
+          <h3>The single greatest framework ever created!</h3>
+          <p>(at least thats what they say ;))</p>
 					<p>Chris Hallendy</p>
 				</section>
 				<section>
@@ -70,7 +72,7 @@
           </section>
           <section>
 					  <img src="/img/micro_service.png" alt="">
-            <a href="http://martinfowler.com/articles/microservices.html">http://martinfowler.com/articles/microservices.html</a> 
+            <a href="http://martinfowler.com/articles/microservices.html">martinfowler.com/articles/microservices.html</a> 
           </section>
           <section>
             <h2>Conway's Law implies that micro-services lead to small independent teams</h2>
@@ -105,19 +107,23 @@
             </blockquote>
           </section>
           <section>
-                    <h2>Who Created it?</h2>
-                    <div>@coda</div>
-                    <blockquote>As I've said before, the
-                        only reason Dropwizard exists at all is to provide opinions on what a service should be.
-                        I think they work better.It embeds Jetty because I
-                        think that works better.It uses Jackson because I
-                        think that works better.It uses Jersey because I
-                        think that works better.It has a single YAML
-                        configuration file because I think that works better.
-                        It wraps Logback because
-                        I think that works better.
-                    </blockquote>
-
+            <h2>Who Created it?</h2>
+            <div>@coda</div>
+            <blockquote>As I've said before, the
+                only reason Dropwizard exists at all is to provide opinions on what a service should be.
+                I think they work better.It embeds Jetty because I
+                think that works better.It uses Jackson because I
+                think that works better.It uses Jersey because I
+                think that works better.It has a single YAML
+                configuration file because I think that works better.
+                It wraps Logback because
+                I think that works better.
+            </blockquote>
+          </section>
+          <section>
+            <h2>Why use it?</h2>
+            <a href="http://www.techempower.com/benchmarks/#section=data-r9&hw=peak&test=query">Benchmarks</a>
+            <img src="/img/bench2.png" alt="bench">
           </section>
           <section>
             <a href="https://dropwizard.github.io/dropwizard/index.html#">dropwizard.io</a>
@@ -194,7 +200,7 @@ public class VisitResource  {
     </section>
     <section>
         <h2>The Representation</h2>
-        <div>Your POGOs will be turned into JSON via Jackson. Hibernate Validator lets you specify validation rules.</div>
+        <div>Your POGOs will be turned into JSON via Jackson.</div>
         <div>
             <pre><code contenteditable style="font-size: 18px; margin-top: 20px;">@Entity
 @Table(name = "visits")
@@ -223,7 +229,7 @@ public class Visit {
         <div>Yammer Metrics is built in and provides metrics over an administration port (8081). Resources can
             be annotated with <code>@Timed</code> or <code>@Metered</code>, and <code>@ExceptionMetered</code>.
             Dropwizard augments Jersey to automatically record runtime information about your resource methods.</div>
-          <a href="https://dropwizard.github.io/metrics/3.1.0/">https://dropwizard.github.io/metrics/3.1.0/</a>
+          <a href="https://dropwizard.github.io/metrics/3.1.0/">metrics</a>
     </section>
     <section>
         <h2>Health Checks</h2>
